@@ -1,8 +1,9 @@
-
 package repository
 
-import ("gorm.io/gorm",
-		"user/models")
+import (
+	"github.com/afifsylhet/spotsync-api/models"
+	"gorm.io/gorm"
+)
 
 type UserRepository interface {
 	CreateUser(user *models.User) error
