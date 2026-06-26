@@ -1,5 +1,11 @@
 go
+
 package dto
+
+
+
+
+
 import "time"
 // --- REQUEST DTOs --
 type CreateReservationRequest struct {
@@ -34,11 +40,6 @@ type AdminReservationResponse struct {
     ID           uint `json:"id"`
     LicensePlate string `json:"license_plate"`
     Status       string `json:"status"`
-8. Repository Layer (
-repository/
- folder)
-Repositories ONLY talk to the database. No HTTP, no business logic.
-repository/user_repository.go
     User         UserBasic     `json:"user"`
     Zone         ZoneBasic     `json:"zone"`
     CreatedAt    time.Time     `json:"created_at"`
