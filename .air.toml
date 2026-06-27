@@ -2,11 +2,19 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-cmd = "go build -o ./tmp/main ."
-bin = "./tmp/main"
+cmd = "go build -o ./tmp/main ./cmd/main.go"
+entrypoint = ["./tmp/main"]
 delay = 1000
 exclude_dir = ["tmp", "vendor"]
 include_ext = ["go"]
+send_interrupt = true
+kill_delay = 2000
+stop_on_error = true
+
+[build.windows]
+cmd = "go build -o ./tmp/main.exe ./cmd/main.go"
+entrypoint = ["./tmp/main.exe"]
+kill_delay = 2000
 
 [log]
 time = false

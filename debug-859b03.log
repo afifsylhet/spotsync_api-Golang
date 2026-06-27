@@ -1,0 +1,5 @@
+{"data":{"hasUpdated":true,"type":"ev_charging"},"hypothesisId":"H2","location":"zone/handler.go:CreateZone","message":"zone created","runId":"post-fix","sessionId":"859b03","timestamp":1782534449684}
+{"data":{"hasUpdated":true,"type":"ev_charging"},"hypothesisId":"H2","location":"zone/handler.go:CreateZone","message":"zone created","runId":"post-fix","sessionId":"859b03","timestamp":1782534543109}
+{"data":{"hasUpdated":true,"type":"covered"},"hypothesisId":"H2","location":"zone/handler.go:CreateZone","message":"zone created","runId":"post-fix","sessionId":"859b03","timestamp":1782534557206}
+{"data":{"hasUpdated":true,"type":"covered"},"hypothesisId":"H2","location":"zone/handler.go:CreateZone","message":"zone created","runId":"post-fix","sessionId":"859b03","timestamp":1782534575784}
+{"data":{"hasUpdated":true,"type":"general"},"hypothesisId":"H2","location":"zone/handler.go:CreateZone","message":"zone created","runId":"post-fix","sessionId":"859b03","timestamp":1782534603483}

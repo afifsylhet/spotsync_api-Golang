@@ -1,0 +1,527 @@
+{
+	"info": {
+		"_postman_id": "spotsync-api-collection",
+		"name": "SpotSync API",
+		"description": "Complete Postman collection for the SpotSync Smart Parking & EV Charging Reservation API.\n\nBase URL: {{baseUrl}}\n\n## Quick start\n1. Run **Register Admin** (or use existing credentials)\n2. Run **Login Admin** — saves `token` automatically\n3. Run **Create Parking Zone** — saves `zoneId` automatically\n4. Run **Login Driver** (or register a driver) for reservation tests\n5. Run **Create Reservation** — saves `reservationId` automatically\n\n## Zone types\n`general` | `ev_charging` | `covered`\n\n## Roles\n`driver` | `admin`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api/v1"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "zoneId",
+			"value": "1"
+		},
+		{
+			"key": "reservationId",
+			"value": "1"
+		},
+		{
+			"key": "driverEmail",
+			"value": "driver@spotsync.com"
+		},
+		{
+			"key": "driverPassword",
+			"value": "securePassword123"
+		},
+		{
+			"key": "adminEmail",
+			"value": "admin@spotsync.com"
+		},
+		{
+			"key": "adminPassword",
+			"value": "securePassword123"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Public authentication endpoints.",
+			"item": [
+				{
+					"name": "Register Driver",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"{{driverEmail}}\",\n  \"password\": \"{{driverPassword}}\",\n  \"role\": \"driver\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new driver account.\n\n**Access:** Public\n\n**Success:** 201 Created"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\",\n  \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new admin account.\n\n**Access:** Public\n\n**Success:** 201 Created"
+					},
+					"response": []
+				},
+				{
+					"name": "Login Driver",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const json = pm.response.json();",
+									"    pm.collectionVariables.set('token', json.data.token);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{driverEmail}}\",\n  \"password\": \"{{driverPassword}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login as driver. Automatically saves JWT to `token` collection variable.\n\n**Access:** Public\n\n**Success:** 200 OK"
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const json = pm.response.json();",
+									"    pm.collectionVariables.set('token', json.data.token);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login as admin. Automatically saves JWT to `token` collection variable.\n\n**Access:** Public\n\n**Success:** 200 OK"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Parking Zones",
+			"description": "Parking zone management. GET endpoints are public; create/update/delete require admin JWT.",
+			"item": [
+				{
+					"name": "Get All Parking Zones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/zones",
+							"host": ["{{baseUrl}}"],
+							"path": ["zones"]
+						},
+						"description": "List all parking zones with dynamically calculated `available_spots`.\n\n**Access:** Public\n\n**Success:** 200 OK"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Parking Zone By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/zones/{{zoneId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["zones", "{{zoneId}}"]
+						},
+						"description": "Get a single parking zone by ID including `available_spots`.\n\n**Access:** Public\n\n**Success:** 200 OK"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Parking Zone (EV Charging)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const json = pm.response.json();",
+									"    pm.collectionVariables.set('zoneId', json.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Terminal 1 EV Charging\",\n  \"type\": \"ev_charging\",\n  \"total_capacity\": 20,\n  \"price_per_hour\": 5.50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/zones",
+							"host": ["{{baseUrl}}"],
+							"path": ["zones"]
+						},
+						"description": "Create an EV charging zone.\n\n**Access:** Admin only\n\n**Zone types:** `general`, `ev_charging`, `covered`\n\n**Success:** 201 Created\n\nAutomatically saves `zoneId` from response."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Parking Zone (Covered)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const json = pm.response.json();",
+									"    pm.collectionVariables.set('zoneId', json.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Terminal 2 Covered Parking\",\n  \"type\": \"covered\",\n  \"total_capacity\": 50,\n  \"price_per_hour\": 3.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/zones",
+							"host": ["{{baseUrl}}"],
+							"path": ["zones"]
+						},
+						"description": "Create a covered parking zone.\n\n**Access:** Admin only\n\n**Success:** 201 Created"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Parking Zone (General)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const json = pm.response.json();",
+									"    pm.collectionVariables.set('zoneId', json.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Mall General Parking\",\n  \"type\": \"general\",\n  \"total_capacity\": 100,\n  \"price_per_hour\": 2.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/zones",
+							"host": ["{{baseUrl}}"],
+							"path": ["zones"]
+						},
+						"description": "Create a general parking zone.\n\n**Access:** Admin only\n\n**Success:** 201 Created"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Parking Zone",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Terminal 1 EV Charging (Updated)\",\n  \"total_capacity\": 25,\n  \"price_per_hour\": 6.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/zones/{{zoneId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["zones", "{{zoneId}}"]
+						},
+						"description": "Update an existing parking zone. All fields are optional.\n\n**Access:** Admin only\n\n**Success:** 200 OK"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Parking Zone",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/zones/{{zoneId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["zones", "{{zoneId}}"]
+						},
+						"description": "Delete a parking zone by ID.\n\n**Access:** Admin only\n\n**Success:** 200 OK"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reservations",
+			"description": "Reservation endpoints. All require JWT. Admin-only for listing all reservations.",
+			"item": [
+				{
+					"name": "Create Reservation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const json = pm.response.json();",
+									"    pm.collectionVariables.set('reservationId', json.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"zone_id\": {{zoneId}},\n  \"license_plate\": \"ABC-1234\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reservations",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations"]
+						},
+						"description": "Reserve a parking/EV spot. Uses row-level locking to prevent over-capacity.\n\n**Access:** Authenticated (driver or admin)\n\n**Success:** 201 Created\n\n**Conflict:** 409 when zone is at full capacity\n\nAutomatically saves `reservationId` from response."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Reservations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations/my-reservations",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "my-reservations"]
+						},
+						"description": "Get all reservations for the authenticated user, including zone details.\n\n**Access:** Authenticated\n\n**Success:** 200 OK"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Reservation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations/{{reservationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "{{reservationId}}"]
+						},
+						"description": "Cancel a reservation. Drivers can only cancel their own reservations.\n\n**Access:** Authenticated\n\n**Success:** 200 OK\n\n**Forbidden:** 403 when trying to cancel another user's reservation"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Reservations (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations"]
+						},
+						"description": "Get all reservations in the system with user and zone details.\n\n**Access:** Admin only\n\n**Success:** 200 OK"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
